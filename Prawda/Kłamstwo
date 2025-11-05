@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Prawda i Kłamstwo — rozmowy</title>
+<link rel="icon" href="data:;base64,iVBORw0KGgo=">
+<style>
+  :root{
+    --bg1: #FFF8F2;
+    --bg2: #F3EEF9;
+    --card: #FFFFFF;
+    --accent: #7D5A50;
+    --muted: #6b6b6b;
+    --soft: #EAD9C9;
+    --glass: rgba(255,255,255,0.7);
+    --round: 14px;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family: Inter, "Segoe UI", Roboto, system-ui, -apple-system, "Helvetica Neue", Arial;
+    background: linear-gradient(180deg,var(--bg1),var(--bg2));
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:18px;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .app{
+    width:100%;
+    max-width:520px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.78), rgba(250,245,240,0.85));
+    border-radius: 18px;
+    box-shadow: 0 10px 30px rgba(40,30,20,0.12);
+    padding:18px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    min-height:640px;
+  }
+
+  header{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .title{
+    display:flex;
+    gap:10px;
+    align-items:center;
+  }
+  .logo{
+    width:48px;height:48px;border-radius:12px;
+    background: conic-gradient(#FFEBD6,#F6E7FF,#E8F7F0);
+    display:flex;align-items:center;justify-content:center;
+    font-weight:700;color:var(--accent);
+    box-shadow: 0 4px 12px rgba(125,90,80,0.12);
+  }
+  h1{font-size:1.05rem;margin:0;color:var(--accent)}
+  p.lead{margin:0;font-size:0.86rem;color:var(--muted)}
+
+  .controls{
+    display:flex;
+    gap:8px;
+    align-items:center;
+  }
+  select, button.small{
+    border-radius:10px;padding:8px 10px;border:none;background:var(--soft);
+    color:var(--accent);font-weight:600;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.04);
+  }
+
+  main{flex:1;display:flex;flex-direction:column;gap:12px;align-items:stretch;justify-content:center;padding:6px 2px;}
+  .card{
+    background:linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.9));
+    border-radius:var(--round);padding:18px;box-shadow:0 6px 18px rgba(30,20,10,0.06);
+  }
+  .question{
+    font-size:1.2rem;color: #362f2a;line-height:1.4;min-height:72px;
+  }
+  .meta{display:flex;gap:8px;align-items:center;color:var(--muted);font-size:0.85rem;margin-top:6px}
+
+  .buttons{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;justify-content:center}
+  .btn{
+    flex:1 1 45%;
+    padding:14px 12px;border-radius:12px;border:none;font-size:1rem;font-weight:700;
+    color:white;cursor:pointer;box-shadow:0 6px 14px rgba(0,0,0,0.06);
+  }
+  .truth{background:linear-gradient(180deg,#5FBF8C,#3DAA73)}
+  .lie{background:linear-gradient(180deg,#FF8B94,#E7606B)}
+  .ghost{background:transparent;border:1px solid rgba(0,0,0,0.06);color:var(--accent);font-weight:600}
+
+  .reflection{margin-top:12px;padding:12px;border-radius:10px;background:linear-gradient(180deg, rgba(240,240,240,0.6), rgba(250,250,250,0.6));color:var(--muted);font-style:italic}
+
+  footer{display:flex;gap:8px;align-items:center;justify-content:space-between;padding-top:6px}
+  .small-info{font-size:0.82rem;color:var(--muted)}
+
+  .link-ui{display:flex;gap:8px;align-items:center}
+  .link-field{padding:8px 10px;border-radius:10px;background:#fff;border:1px solid rgba(0,0,0,0.06);font-size:0.9rem;min-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+  .center{text-align:center}
+  /* responsive */
+  @media (max-width:420px){
+    .app{padding:14px;border-radius:12px}
+    .btn{font-size:0.95rem;padding:12px}
+  }
+</style>
+</head>
+<body>
+<div class="app" role="application">
+  <header>
+    <div class="title">
+      <div class="logo">P&K</div>
+      <div>
+        <h1>Prawda i Kłamstwo</h1>
+        <p class="lead">Krótka gra, która otwiera rozmowę. 🌿</p>
+      </div>
+    </div>
+
+    <div class="controls">
+      <select id="modeSelect" title="Wybierz tryb">
+        <option value="solo">Solo</option>
+        <option value="link">Gra przez link</option>
+      </select>
+      <button class="small" id="newRoundBtn">Nowa tura</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <strong style="color:var(--accent)">Kategoria:</strong>
+          <select id="categorySelect" style="margin-left:8px;border-radius:10px;padding:6px 8px;border:none;background:var(--soft)">
+            <option value="mix">Mieszane</option>
+            <option value="emotions">Emocje</option>
+            <option value="relations">Relacje</option>
+            <option value="dreams">Marzenia</option>
+            <option value="light">Lekkość</option>
+          </select>
+        </div>
+        <div class="meta" id="progressMeta">Pytanie 1/1</div>
+      </div>
+
+      <div style="height:14px"></div>
+
+      <div id="qCard" class="question card" aria-live="polite"></div>
+
+      <div class="buttons" style="margin-top:8px">
+        <button class="btn truth" id="truthBtn">✅ Prawda</button>
+        <button class="btn lie" id="lieBtn">❌ Kłamstwo</button>
+      </div>
+
+      <div id="postArea" style="margin-top:12px">
+        <div id="reflection" class="reflection" style="display:none"></div>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-top:12px;align-items:center;flex-wrap:wrap">
+        <button class="ghost" id="nextBtn">Następne pytanie 🔄</button>
+        <button class="ghost" id="shareBtn">Utwórz link / Kopiuj</button>
+        <button class="ghost" id="shuffleBtn">Przemieszaj pytania</button>
+      </div>
+    </div>
+
+    <div class="card small center" style="font-size:0.92rem;color:var(--muted)">
+      <div style="margin-bottom:8px">Tryb Link — utwórz link i wyślij drugiej osobie. Osoba otwierająca link zobaczy to samo pytanie (na tym etapie host musi aktualizować link, aby przejść dalej).</div>
+      <div style="display:flex;gap:8px;align-items:center;justify-content:center">
+        <div class="link-field" id="linkField">Brak linku</div>
+        <button class="ghost" id="copyLinkBtn">Kopiuj</button>
+      </div>
+    </div>
+
+  </main>
+
+  <footer>
+    <div class="small-info">Tryb: <span id="modeLabel">Solo</span></div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <div style="font-size:0.82rem;color:var(--muted)">Udostępnij i rozmawiaj. Brak ocen. 💬</div>
+    </div>
+  </footer>
+</div>
+
+<script>
+/* ======= DANE PYTAŃ (przykładowa baza) =======
+   Każda karta ma: text, reflection, category, tone(optional)
+*/
+const QUESTIONS = [
+  // Emotions
+  {cat:'emotions', text:"Czasami ukrywam swoje prawdziwe uczucia, żeby nie obciążać innych.", reflection:"Czy można to zmienić? Co by pomogło, byś czuł/a się bezpieczniej, by mówić otwarcie?"},
+  {cat:'emotions', text:"Łatwiej jest mi wyrazić emocje przez żart niż bezpośrednio.", reflection:"Czy humor pomaga czy raczej przesłania to, co czujesz?"},
+  {cat:'emotions', text:"Czuję, że ktoś często mnie nie rozumie, nawet gdy mówię szczerze.", reflection:"Jakie sytuacje powodują to uczucie?"},
+  // Relations
+  {cat:'relations', text:"Zdarzyło mi się zatajać coś ważnego przed bliską osobą.", reflection:"Dlaczego to zataiłeś/aś? Co by się zmieniło, gdybyś powiedział/a?"},
+  {cat:'relations', text:"Lubię, gdy ktoś zauważa moje małe codzienne starania.", reflection:"Jakie drobne gesty sprawiają, że czujesz się doceniony/a?"},
+  {cat:'relations', text:"Czuję się bezpiecznie, kiedy mogę być sobą bez udawania.", reflection:"Kiedy ostatnio czułeś/aś się w pełni sobą?"},
+  // Dreams
+  {cat:'dreams', text:"Mam marzenie, którego nikomu jeszcze nie powiedziałem/łam.", reflection:"Co powstrzymuje Cię przed podzieleniem się nim?"},
+  {cat:'dreams', text:"Boję się, że moje plany nie zostaną zrozumiane przez bliskich.", reflection:"Jak by wyglądała rozmowa, w której mogliby Cię zrozumieć?"},
+  {cat:'dreams', text:"Czasami wyobrażam sobie życie całkiem inne niż obecne.", reflection:"Co najbardziej kusi Cię w tej wyobraźni?"},
+  // Light
+  {cat:'light', text:"Zdarzyło mi się udawać, że rozumiem żart, żeby nie psuć nastroju.", reflection:"Który żart był tego wart? 😉"},
+  {cat:'light', text:"Czasami śmieję się z rzeczy, które kiedyś mnie stresowały.", reflection:"Czy to pomaga, czy raczej oddala od problemu?"},
+  {cat:'light', text:"Mam dziwne pytanie, na które nikt nie zna odpowiedzi — i to lubię.", reflection:"Jaka to była myśl?"},
+  // Mixed deeper
+  {cat:'mix', text:"Czasami udaję, że wszystko jest w porządku, choć w środku nie jest.", reflection:"Kiedy ostatnio tak było i co wtedy zrobiłeś/aś?"},
+  {cat:'mix', text:"Boję się powiedzieć najważniejszą prawdę o sobie.", reflection:"Co trzyma Cię przed powiedzeniem jej?"},
+  {cat:'mix', text:"Chciałbym/chciałabym, żeby ktoś mnie zapytał o coś, o czym nigdy nie rozmawiałem/am.", reflection:"O co to by było?"},
+  {cat:'mix', text:"Często myślę, że inni radzą sobie lepiej niż ja.", reflection:"Czy to porównanie pomaga czy szkodzi?"},
+];
+
+let state = {
+  mode: 'solo', // 'solo' or 'link'
+  category: 'mix',
+  order: [],
+  index: 0,
+  room: null, // for link mode: {id, host}
+};
+
+const el = {
+  qCard: document.getElementById('qCard'),
+  reflection: document.getElementById('reflection'),
+  truthBtn: document.getElementById('truthBtn'),
+  lieBtn: document.getElementById('lieBtn'),
+  nextBtn: document.getElementById('nextBtn'),
+  shareBtn: document.getElementById('shareBtn'),
+  shuffleBtn: document.getElementById('shuffleBtn'),
+  modeSelect: document.getElementById('modeSelect'),
+  categorySelect: document.getElementById('categorySelect'),
+  linkField: document.getElementById('linkField'),
+  copyLinkBtn: document.getElementById('copyLinkBtn'),
+  newRoundBtn: document.getElementById('newRoundBtn'),
+  modeLabel: document.getElementById('modeLabel'),
+  progressMeta: document.getElementById('progressMeta')
+};
+
+function shuffleArray(a){
+  for(let i=a.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+function buildOrder(){
